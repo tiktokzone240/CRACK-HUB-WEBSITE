@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from '../components/SearchBar';
 import AppCard from '../components/AppCard';
-import { INITIAL_APPS } from '../data/apps';
 import { getApps } from '../services/firebase';
 import { filterAppsByName } from '../utils/helpers';
 import { Terminal, Flame, Sparkles, Cpu, Layers } from 'lucide-react';
 
 export default function Home() {
-  const [apps, setApps] = useState(INITIAL_APPS);
+  const [apps, setApps] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
