@@ -5,7 +5,7 @@ import { Shield, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('admin@badhonshub.com');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -67,7 +67,7 @@ export default function AdminLogin() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              placeholder="admin@badhonshub.com"
+              placeholder="example@gmail.com"
               className="w-full bg-black/60 border border-white/15 focus:border-[#00ff41] rounded-lg py-2.5 px-3 text-white focus:outline-none"
             />
           </div>
