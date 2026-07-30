@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "apps": {
+      "title": "Apps",
+      "description": "Android Apps and Games listed on Badhon's Crack Hub",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "version": { "type": "string" },
+        "size": { "type": "string" },
+        "downloads": { "type": "number" },
+        "updatedDate": { "type": "string" },
+        "icon": { "type": "string" },
+        "banner": { "type": "string" },
+        "description": { "type": "string" },
+        "screenshots": { 
+          "type": "array", 
+          "items": { "type": "string" } 
+        },
+        "downloadUrl": { "type": "string" }
+      },
+      "required": ["title", "version", "size", "downloadUrl"]
+    }
+  }
+}

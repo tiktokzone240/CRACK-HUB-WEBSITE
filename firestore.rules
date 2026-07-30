@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to verify if the requesting user is the hardcoded Admin
+    function isAdmin() {
+      return request.auth != null && request.auth.uid == 'ZHu3iExg0vewZgqFlUVQsHINyCy2';
+    }
+
+    // Helper function to verify if an update operation ONLY increments the 'downloads' counter field by 1
+    function isDownloadsOnlyUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads'])
+        && request.resource.data.downloads is int
+        && request.resource.data.downloads == (resource.data.get('downloads', 0) + 1);
+    }
+
+    // Rules for 'apps' collection
+    match /apps/{appId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || isDownloadsOnlyUpdate();
+    }
+
+    // Rules for 'Apps' collection (case variation compatibility)
+    match /Apps/{appId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || isDownloadsOnlyUpdate();
+    }
+
+    // Default fallback rule: deny all other unhandled read/write operations
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+
