@@ -80,7 +80,7 @@ export default function AdminLogin() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password..."
+              placeholder="Enter password..."
               className="w-full bg-black/60 border border-white/15 focus:border-[#00ff41] rounded-lg py-2.5 px-3 text-white focus:outline-none"
             />
           </div>
