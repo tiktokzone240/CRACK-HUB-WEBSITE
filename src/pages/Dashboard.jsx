@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { INITIAL_APPS } from '../data/apps';
 import { getApps, addApp, updateApp, deleteApp, logoutAdmin } from '../services/firebase';
 import { Plus, Trash2, Edit3, LogOut, Search, Terminal, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [appsList, setAppsList] = useState(INITIAL_APPS);
+  const [appsList, setAppsList] = useState([]);
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingApp, setEditingApp] = useState(null); // null if adding new app, or app object if editing
+  const [editingApp, setEditingApp] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState('');
