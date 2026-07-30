@@ -20,12 +20,9 @@ import {
   setPersistence,
   inMemoryPersistence
 } from 'firebase/auth';
-import { INITIAL_APPS } from '../data/apps';
 
-// Admin UID specified for access control
 export const ADMIN_UID = 'ZHu3iExg0vewZgqFlUVQsHINyCy2';
 
-// Read config from Vite environment variables with fallback to firebase-applet-config.json
 let configFromJson = {};
 try {
   const firebaseConfigModule = import.meta.glob('/firebase-applet-config.json', { eager: true });
@@ -33,7 +30,6 @@ try {
     configFromJson = firebaseConfigModule['/firebase-applet-config.json'].default || firebaseConfigModule['/firebase-applet-config.json'];
   }
 } catch {
-  // Ignore fallback loading errors
 }
 
 const firebaseConfig = {
@@ -61,7 +57,6 @@ if (isFirebaseConfigured) {
   app = getFirebaseApps().length === 0 ? initializeApp(firebaseConfig) : getFirebaseApps()[0];
   db = (databaseId && databaseId !== '(default)') ? getFirestore(app, databaseId) : getFirestore(app);
   auth = getAuth(app);
-  // Ensure in-memory persistence and clear session on initialization/refresh
   setPersistence(auth, inMemoryPersistence).catch((e) => {
     console.warn('Failed to set inMemoryPersistence:', e);
   });
@@ -72,20 +67,10 @@ export { db, auth };
 
 const APPS_COLLECTION = 'Apps';
 
-/**
- * Admin Authentication Service Functions
- */
-
-/**
- * Login admin user with Email and Password
- * @param {string} email
- * @param {string} password
- */
 export async function loginAdmin(email, password) {
   if (!auth) {
     throw new Error('Firebase Auth is not configured.');
   }
-  // Enforce inMemoryPersistence before sign-in so session is never saved across reloads
   await setPersistence(auth, inMemoryPersistence);
   const userCredential = await signInWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
@@ -98,18 +83,11 @@ export async function loginAdmin(email, password) {
   return user;
 }
 
-/**
- * Logout current admin user
- */
 export async function logoutAdmin() {
   if (!auth) return;
   await signOut(auth);
 }
 
-/**
- * Subscribe to Firebase Auth state changes
- * @param {Function} callback
- */
 export function subscribeToAuthState(callback) {
   if (!auth) {
     callback(null);
@@ -118,57 +96,16 @@ export function subscribeToAuthState(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-/**
- * Firestore Database Service Functions (Collection: Apps)
- */
-
-/**
- * Get all apps from Firestore 'Apps' collection
- * Seeds INITIAL_APPS if the collection is empty
- */
 export async function getApps() {
-  if (!db) return INITIAL_APPS;
+  if (!db) return [];
   try {
     const appsRef = collection(db, APPS_COLLECTION);
     const snapshot = await getDocs(appsRef);
     
     if (snapshot.empty) {
-      const hasSeeded = localStorage.getItem('badhon_hub_seeded') === 'true';
-      if (hasSeeded) {
-        return [];
-      }
-
-      // Auto-seed INITIAL_APPS into Firestore 'Apps' collection on first initialization
-      const seededList = [];
-      for (const item of INITIAL_APPS) {
-        try {
-          const docRef = doc(db, APPS_COLLECTION, item.id);
-          await setDoc(docRef, {
-            title: item.title || '',
-            appName: item.title || '',
-            version: item.version || '',
-            size: item.size || '',
-            downloads: item.downloads || 0,
-            description: item.description || '',
-            icon: item.icon || '',
-            banner: item.banner || '',
-            downloadUrl: item.downloadUrl || '',
-            screenshots: item.screenshots || [],
-            createdAt: serverTimestamp()
-          });
-          seededList.push({
-            ...item,
-            id: item.id
-          });
-        } catch (e) {
-          console.warn('Seeding single item error:', e);
-        }
-      }
-      localStorage.setItem('badhon_hub_seeded', 'true');
-      return seededList.length > 0 ? seededList : INITIAL_APPS;
-    }
-
-    localStorage.setItem('badhon_hub_seeded', 'true');
+  return [];
+}
+    
     const appsList = [];
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
@@ -183,18 +120,14 @@ export async function getApps() {
     return appsList;
   } catch (error) {
     console.error('Error fetching apps from Firestore:', error);
-    return INITIAL_APPS;
+    return [];
   }
 }
 
-/**
- * Get a single app by ID from Firestore 'Apps' collection
- * @param {string} id
- */
 export async function getAppById(id) {
   if (!db || !id) {
-    return INITIAL_APPS.find((item) => item.id === id) || INITIAL_APPS[0];
-  }
+  return null;
+ }
   try {
     const docRef = doc(db, APPS_COLLECTION, id);
     const docSnap = await getDoc(docRef);
@@ -208,19 +141,13 @@ export async function getAppById(id) {
         appName: appName
       };
     }
-    // Fallback search in initial data
-    return INITIAL_APPS.find((item) => item.id === id) || null;
+    return null;
   } catch (error) {
     console.error('Error getting app by ID from Firestore:', error);
-    return INITIAL_APPS.find((item) => item.id === id) || null;
+    return null;
   }
 }
 
-/**
- * Helper to generate document ID slug from app name
- * Example: "Subway Surfers" => "subway-surfers"
- * @param {string} appName
- */
 export function slugifyAppName(appName) {
   if (!appName) return `app-${Date.now()}`;
   const slug = appName
@@ -235,10 +162,6 @@ export function slugifyAppName(appName) {
   return slug || `app-${Date.now()}`;
 }
 
-/**
- * Add a new app document to Firestore 'Apps' collection using slugified app ID
- * @param {Object} appData
- */
 export async function addApp(appData) {
   if (!db) throw new Error('Firestore is not configured.');
   const { id: _, ...dataToSave } = appData;
@@ -257,11 +180,6 @@ export async function addApp(appData) {
   };
 }
 
-/**
- * Update an existing app document in Firestore 'Apps' collection
- * @param {string} id
- * @param {Object} appData
- */
 export async function updateApp(id, appData) {
   if (!db || !id) throw new Error('Firestore is not configured or missing ID.');
   const { id: _, ...dataToSave } = appData;
@@ -273,10 +191,6 @@ export async function updateApp(id, appData) {
   return { ...dataToSave, id };
 }
 
-/**
- * Delete an app document from Firestore 'Apps' collection
- * @param {string} id
- */
 export async function deleteApp(id) {
   if (!db || !id) throw new Error('Firestore is not configured or missing ID.');
 
@@ -288,7 +202,6 @@ export async function deleteApp(id) {
     await deleteDoc(doc(db, APPS_COLLECTION, id));
     console.log("DELETE SUCCESS", id);
 
-    // Also attempt cleanup on lowercase 'apps' collection if present
     try {
       await deleteDoc(doc(db, 'apps', id));
     } catch (_) {}
@@ -301,10 +214,6 @@ export async function deleteApp(id) {
   }
 }
 
-/**
- * Increment download count for an app document in Firestore
- * @param {string} id
- */
 export async function incrementDownloadCount(id) {
   if (!db || !id) return;
   try {
@@ -332,4 +241,3 @@ export default {
   deleteApp,
   incrementDownloadCount
 };
-
