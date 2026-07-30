@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { INITIAL_APPS } from '../data/apps';
 import { getAppById, incrementDownloadCount } from '../services/firebase';
 import { formatDownloads } from '../utils/helpers';
 import { ArrowLeft, Download } from 'lucide-react';
@@ -8,21 +7,29 @@ import { ArrowLeft, Download } from 'lucide-react';
 export default function AppDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [app, setApp] = useState(() => INITIAL_APPS.find((item) => item.id === id) || INITIAL_APPS[0]);
+  const [app, setApp] = useState(null);
 
-  useEffect(() => {
-    async function loadAppDetail() {
-      try {
-        const fetchedApp = await getAppById(id);
-        if (fetchedApp) {
-          setApp(fetchedApp);
-        }
-      } catch (error) {
-        console.error('Error fetching app by ID:', error);
+ useEffect(() => {
+  async function loadAppDetail() {
+    try {
+      const fetchedApp = await getAppById(id);
+      if (fetchedApp) {
+        setApp(fetchedApp);
       }
+    } catch (error) {
+      console.error('Error fetching app by ID:', error);
     }
-    loadAppDetail();
-  }, [id]);
+  }
+  loadAppDetail();
+}, [id]);
+
+if (!app) {
+  return (
+    <div className="flex items-center justify-center py-20">
+      <p className="text-white font-mono">Loading...</p>
+    </div>
+  );
+}
 
   const handleDownload = async () => {
     if (app && app.downloadUrl) {
