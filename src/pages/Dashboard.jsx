@@ -1,4 +1,18 @@
-import React, { useState, useEffect } from 'react';
+impor {/* Quick Filter */}
+          <div className="relative w-full sm:w-64">
+            <label htmlFor="dashboard-search-input" className="sr-only">Search app name</label>
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+            <input
+              id="dashboard-search-input"
+              name="searchTerm"
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search apps..."
+              className="w-full bg-black/60 border border-white/15 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-[#00ff41]"
+            />
+          </div>
+        </div>t React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getApps, addApp, updateApp, deleteApp, logoutAdmin } from '../services/firebase';
 import { Plus, Trash2, Edit3, LogOut, Search, Terminal, AlertCircle, Loader2 } from 'lucide-react';
