@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 impor {/* Quick Filter */}
           <div className="relative w-full sm:w-64">
             <label htmlFor="dashboard-search-input" className="sr-only">Search app name</label>
@@ -100,12 +101,12 @@ export default function Dashboard() {
       setDeleteError('Error: Missing App ID.');
       return;
     }
-    
+
     try {
       setIsSaving(true);
       setDeleteError('');
       console.log('[Dashboard] Executing delete for app ID:', appId);
-      
+
       // Remove deleted app from UI state immediately
       setAppsList((prev) => prev.filter((item) => item.id !== appId && item.firestoreId !== appId));
 
@@ -201,7 +202,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      
+
       {/* Top Admin Bar */}
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center space-x-3">
@@ -241,7 +242,7 @@ export default function Dashboard() {
 
       {/* App Inventory List */}
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-4">
-        
+
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
           <h2 className="font-orbitron font-bold text-lg text-white uppercase">
             FIRESTORE APPS INVENTORY ({filteredInventory.length})
@@ -333,7 +334,7 @@ export default function Dashboard() {
       {deleteTarget && (
         <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#0c0c0c] border border-red-500/30 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl font-mono text-xs">
-            
+
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="font-orbitron font-bold text-sm text-red-500 flex items-center space-x-2">
                 <AlertCircle className="w-4 h-4 text-red-500" />
@@ -394,7 +395,7 @@ export default function Dashboard() {
       {showFormModal && (
         <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 pt-16 sm:pt-20 pb-6 overflow-hidden">
           <div className="bg-[#0c0c0c] border border-[#00ff41]/40 rounded-2xl max-w-xl w-full flex flex-col max-h-[calc(100vh-110px)] shadow-[0_0_35px_rgba(0,255,65,0.2)] font-mono text-xs overflow-hidden my-auto">
-            
+
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-white/10 px-6 py-4 flex-shrink-0 bg-[#0c0c0c]">
               <h3 className="font-orbitron font-bold text-sm text-[#00ff41] tracking-wider flex items-center space-x-2">
